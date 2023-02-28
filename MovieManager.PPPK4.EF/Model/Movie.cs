@@ -28,6 +28,8 @@ namespace MovieManager.PPPK4.EntityFramework.Model
         public DateTime PublishedDate { get; set; }
         public virtual ICollection<Asset> Assets { get; set; }
         public virtual Person Director { get; set; }
+
+        [Required(ErrorMessage = "You must pick a director")]
         public int DirectorId { get; set; }
         public ICollection<Person> Actors { get; set; }
     }

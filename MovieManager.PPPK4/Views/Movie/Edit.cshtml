@@ -2,6 +2,11 @@
 
 @{
     ViewBag.Title = "Edit";
+
+    SelectList ddlPersonSource = new SelectList(
+        items: new MovieManager.PPPK4.EntityFramework.MovieContext().People,
+        dataTextField: nameof(MovieManager.PPPK4.EntityFramework.Model.Person.FullName),
+        dataValueField: nameof(MovieManager.PPPK4.EntityFramework.Model.Person.Id));
 }
 
 <h2>Edit</h2>
@@ -10,7 +15,7 @@
 @using (Html.BeginForm("Edit", "Movie", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
+
 <div class="form-horizontal">
     <h4>Movie</h4>
     <hr />
@@ -38,6 +43,14 @@
         <div class="col-md-10">
             @Html.EditorFor(model => model.PublishedDate, new { htmlAttributes = new { @class = "form-control" } })
             @Html.ValidationMessageFor(model => model.PublishedDate, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Director", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownList(optionLabel: "Choose a director", selectList: ddlPersonSource, name: "DirectorId", htmlAttributes: new { @class = "form-control", value = Model.DirectorId })
+            @Html.ValidationMessageFor(model => model.DirectorId, "", new { @class = "text-danger" })
         </div>
     </div>
 
