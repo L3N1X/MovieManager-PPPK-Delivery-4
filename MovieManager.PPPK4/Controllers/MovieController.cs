@@ -1,4 +1,5 @@
-﻿using MovieManager.PPPK4.EntityFramework;
+﻿using Microsoft.Ajax.Utilities;
+using MovieManager.PPPK4.EntityFramework;
 using MovieManager.PPPK4.EntityFramework.Model;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,26 @@ namespace MovieManager.PPPK4.Controllers
             return CommonAction(id);
         }
 
+        [HttpPost]
+        public ActionResult AddActor(int movieId, int actorId)
+        {
+            var movie = db.Movies.Include(m => m.Actors).FirstOrDefault(m => m.Id == movieId);
+            var actor = db.People.Find(actorId);
+            movie.Actors.Add(actor);
+            db.SaveChanges();
+            return Json(new { fullname = actor.FullName });
+        }
+
+        [HttpPost]
+        public ActionResult RemoveActor(int movieId, int actorId)
+        {
+            var movie = db.Movies.Include(m => m.Actors).FirstOrDefault(m => m.Id == movieId);
+            var actor = db.People.Find(actorId);
+            movie.Actors.Remove(actor);
+            db.SaveChanges();
+            return Json(new { fullname = actor.FullName });
+        }
+
         private ActionResult CommonAction(int? id)
         {
             if (id == null)
@@ -39,6 +60,7 @@ namespace MovieManager.PPPK4.Controllers
 
             var movie = db.Movies
                 .Include(m => m.Assets)
+                .Include(m => m.Actors)
                 .SingleOrDefault(m => m.Id == id);
 
             if (movie == null)
@@ -103,7 +125,7 @@ namespace MovieManager.PPPK4.Controllers
         {
             var movie = db.Movies.Find(id);
 
-            if (TryUpdateModel(movie, "", new string[] { nameof(Movie.Name), nameof(Movie.Description) }))
+            if (TryUpdateModel(movie, "", new string[] { nameof(Movie.Name), nameof(Movie.Description), nameof(Movie.Assets) }))
             {
                 AddAssets(movie, files);
                 db.Entry(movie).State = EntityState.Modified;

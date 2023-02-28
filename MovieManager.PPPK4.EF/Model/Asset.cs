@@ -16,7 +16,7 @@ namespace MovieManager.PPPK4.EntityFramework.Model
         [Required]
         public string ContentType { get; set; }
 
-        public virtual ICollection<Movie> Movies { get;}
-        public virtual ICollection<Person> People { get;}
+        public virtual ICollection<Movie> Movies { get; set; }
+        public virtual ICollection<Person> People { get; set; }
     }
 }

@@ -20,7 +20,7 @@
     <h4>Movie</h4>
     <hr />
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Id, new { id = "hdnMovieId" })
 
     <div class="form-group">
         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -52,6 +52,27 @@
             @Html.DropDownList(optionLabel: "Choose a director", selectList: ddlPersonSource, name: "DirectorId", htmlAttributes: new { @class = "form-control", value = Model.DirectorId })
             @Html.ValidationMessageFor(model => model.DirectorId, "", new { @class = "text-danger" })
         </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Add actor", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10" style="display:flex; justify-content:flex-start; align-items:center;">
+            @Html.DropDownList(optionLabel: "Choose an actor", selectList: ddlPersonSource, name: "ActorId", htmlAttributes: new { @class = "form-control", id = "ddlActors" })
+            <button type="button" class="btn btn-primary" id="btnAddActor">+</button>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @{ int count = 1;} 
+        @foreach (var actor in Model.Actors)
+        {
+            @Html.Label("Actor " + count, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10" style="display:flex; justify-content:flex-start; align-items:center;">
+                <input type="text" value="@actor.FullName" disabled class="form-control" />
+                <button type="button" onclick="removeActor(@actor.Id)" class="btn btn-danger" id="btnRemoveActor">X</button>
+            </div>
+            count++;
+        }
     </div>
 
     <div class="form-group">
@@ -87,5 +108,64 @@
 </div>
 
 @section Scripts {
+
+    <script>
+
+        const btnAddActor = document.getElementById('btnAddActor');
+
+        btnAddActor.addEventListener('click', () => {
+
+            const movie = document.getElementById('hdnMovieId').value;
+            const actor = document.getElementById('ddlActors').value
+
+            const data = {
+                movieId: movie,
+                actorId: actor
+            };
+
+            fetch('/Movie/AddActor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    location.reload();
+                })
+                .catch((error) => {
+                    alert('You need to select an actor to add!');
+                })
+
+        });
+
+        function removeActor(actorId) {
+            const movie = document.getElementById('hdnMovieId').value;
+            const data = {
+                movieId: movie,
+                actorId: actorId
+            };
+            fetch('/Movie/RemoveActor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json)
+                .then(data => {
+                    location.reload();
+                })
+                .catch(error => {
+                    alert('Failed to remove selected actor, sorry');
+                })
+        }
+
+
+    </script>
+
+
     @Scripts.Render("~/bundles/jqueryval")
+
 }
